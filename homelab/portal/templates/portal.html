@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#633b25">
+  <title>{% if view == 'catalogue' %}Picture Catalogue · {% endif %}{{ site_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+  <script src="{{ url_for('static', filename='portal.js') }}" defer></script>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <a class="brand" href="{{ url_for('index') }}"><span class="star" aria-hidden="true">✳</span><span><small>YOUR PERSONAL PICTURE SHOW</small><strong>{{ site_title }}<span class="brand-dot">.</span></strong></span></a>
+    {% if logged_in %}<nav aria-label="Main navigation">
+      <a href="{{ url_for('index') }}" {% if view == 'home' %}aria-current="page"{% endif %}>The television</a>
+      <a href="{{ url_for('catalogue_page') }}" {% if view == 'catalogue' %}aria-current="page"{% endif %}>Picture catalogue</a>
+      <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="text-button">Sign out</button></form>
+    </nav>{% endif %}
+  </header>
+  <main>
+  {% if preview_mode %}<p class="notice">Design preview · Sample pictures only. Changes here do not affect your TVs or live photo collection.</p>{% endif %}
+  {% for message in get_flashed_messages() %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% if logged_in %}<div class="device-strip" aria-label="TV connection status">
+    {% for device in devices %}<div class="device-indicator" data-device="{{ device.id }}"><span class="status-dot {{ 'online' if device.online else 'offline' }}" aria-hidden="true"></span><span><strong>{{ device.name }}</strong><span class="device-state">{{ 'Online' if device.online else ('Offline' if device.last_seen else 'Not connected yet') }}</span></span></div>{% endfor %}
+    <span class="device-explanation">Green means the TV checked in within 90 seconds.</span>
+  </div>{% endif %}
+  {% if view == 'home' %}
+    <div class="intro"><span class="eyebrow">{% if logged_in %}NOW SHOWING · YOUR PHOTO COLLECTION{% else %}A WI-FI PICTURE FRAME{% endif %}</span><span class="edition">MINI TV / COLOUR DISPLAY</span></div>
+    <section class="television" aria-label="Mini TV picture frame">
+      <div class="tv-face">
+        <div class="tv-top"><span class="badge">MINI TV <em>Picture Frame</em></span><span class="ornament" aria-hidden="true">✳</span><span class="model">THE WI-FI SET</span></div>
+        <div class="tv-layout">
+          <div class="viewing-area">
+            <div class="bezel"><div class="screen">
+              {% if logged_in and catalogue.photos %}<img id="slide" src="{{ url_for('photo', photo_id=catalogue.photos[0].id) }}" alt="{{ catalogue.photos[0].name }}">{% endif %}
+              <div id="empty-screen" class="screen-message" {% if logged_in and catalogue.photos %}hidden{% endif %}>
+                <span class="screen-star" aria-hidden="true">✳</span><strong>{% if logged_in %}Your story starts here.{% else %}{{ site_title }}{% endif %}</strong><span>{% if logged_in %}Add a picture to start the show.{% else %}A few favourite moments,<br>always within reach.{% endif %}</span>
+              </div>
+              <div class="glass" aria-hidden="true"></div>
+            </div></div>
+            <div class="under-screen"><span><i class="lamp" aria-hidden="true"></i>{% if logged_in %}PICTURE SHOW{% else %}READY TO TUNE IN{% endif %}</span><span id="counter">{% if logged_in %}{{ '01' if catalogue.photos else '00' }} / {{ '%02d'|format(catalogue.photos|length) }}{% else %}--{% endif %}</span></div>
+          </div>
+          <aside class="tv-controls">
+            {% if logged_in %}
+              <div class="dial" aria-hidden="true"><div></div></div><span class="dial-label">PICTURE / MEMORY</span>
+              <div class="playback" aria-label="Slideshow controls"><button type="button" id="previous" aria-label="Previous picture">◀</button><button type="button" id="pause" aria-label="Pause slideshow" aria-pressed="false">Ⅱ</button><button type="button" id="next" aria-label="Next picture">▶</button></div>
+              <p class="timing">A new moment every 5 seconds.</p>
+              <a class="button orange" href="{{ url_for('catalogue_page') }}">Add a picture <span aria-hidden="true">＋</span></a>
+              <a class="catalogue-link" href="{{ url_for('catalogue_page') }}">Browse our catalogue →</a>
+              <p id="slide-status" class="small-note" role="status"></p>
+              <div class="speaker" aria-hidden="true"></div>
+            {% else %}
+              <div class="mini-dial" aria-hidden="true"></div>
+              <h1>Welcome to<br>{{ site_title }}</h1>
+              <form method="post" action="{{ url_for('login') }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <label for="password">Picture-frame password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required>
+                <button class="button orange" type="submit">Tune in <span aria-hidden="true">↗</span></button>
+              </form>
+              <div class="speaker" aria-hidden="true"></div>
+            {% endif %}
+          </aside>
+        </div>
+      </div>
+    </section>
+    <div class="tv-legs" aria-hidden="true"><span></span><span></span></div>
+    <p class="tagline">{{ site_tagline }}</p>
+  {% else %}
+    <div class="catalogue-heading"><div><span class="eyebrow">YOUR PHOTO COLLECTION</span><h1>Picture Catalogue<span class="brand-dot">.</span></h1><p>Arrange pictures in the order you want them displayed.</p></div><a class="button olive" href="{{ url_for('index') }}">Watch the show ↗</a></div>
+    <section class="upload-panel" aria-labelledby="upload-title"><div><h2 id="upload-title">Add more memories</h2><p>Choose pictures together, or a whole folder.<br>JPG, PNG or WebP · Up to 20 MB and 24 megapixels per picture.<br>Pictures keep their proportions, with black borders where needed.</p></div>
+      <form id="upload-form" method="post" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><label class="visually-hidden" for="photo">Choose a picture</label>
+        <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" multiple required>
+        <div id="folder-controls" hidden><button id="choose-folder" class="button folder-button" type="button">Choose a folder</button><input id="folder" type="file" webkitdirectory multiple hidden><span id="selection-summary" class="small-note" role="status"></span></div>
+        <button class="button orange" type="submit">Add to our show ＋</button>
+      </form><div class="upload-progress" id="upload-progress" hidden><progress id="upload-meter" value="0" max="1" aria-label="Upload progress"></progress><p id="upload-status" role="status"></p><ul id="upload-errors"></ul><a id="review-uploads" href="{{ url_for('catalogue_page') }}" hidden>View updated catalogue →</a></div>
+    </section>
+    <div class="collection-toolbar"><div><strong>{{ catalogue.photos|length }} {{ 'picture' if catalogue.photos|length == 1 else 'pictures' }}</strong><span>Drag to rearrange, or use the arrow buttons.</span></div><button class="button olive" id="save-order" form="order-form" disabled>Order saved</button></div>
+    <form id="order-form" method="post" action="{{ url_for('reorder') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ catalogue.revision }}"><div id="order-inputs">{% for photo in catalogue.photos %}<input type="hidden" name="order" value="{{ photo.id }}">{% endfor %}</div></form>
+    <div class="photo-grid" id="photo-grid">
+      {% for photo in catalogue.photos %}<article class="photo-card" draggable="true" data-id="{{ photo.id }}">
+        <div class="photo-print"><img src="{{ url_for('photo', photo_id=photo.id) }}" alt="{{ photo.name }}" loading="lazy" draggable="false"><span class="photo-number">{{ '%02d'|format(loop.index) }}</span></div>
+        <h2 title="{{ photo.name }}">{{ photo.name }}</h2>
+        <div class="photo-actions"><div class="move-actions"><button type="button" data-move="-1" aria-label="Move {{ photo.name }} earlier" {% if loop.first %}disabled{% endif %}>←</button><button type="button" data-move="1" aria-label="Move {{ photo.name }} later" {% if loop.last %}disabled{% endif %}>→</button></div><form class="delete-form" method="post" action="{{ url_for('delete', photo_id=photo.id) }}" data-name="{{ photo.name }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ catalogue.revision }}"><button class="delete-button">Delete</button></form></div>
+      </article>{% else %}<div class="empty-catalogue"><span aria-hidden="true">✳</span><h2>Every great show starts with a picture.</h2><p>Add your first using the upload box above.</p></div>{% endfor %}
+    </div>
+    <p id="order-status" class="small-note" role="status"></p>
+    <noscript><p>Enable JavaScript to rearrange pictures and play the slideshow. Uploading and deleting still work.</p></noscript>
+  {% endif %}
+  </main>
+  <footer><span>MINI TV</span><span>A reusable Wi-Fi picture frame.</span><span>{{ site_title|upper }}</span></footer>
+</div>
+{% if logged_in and view == 'home' %}<script id="playlist-data" type="application/json">{{ catalogue|tojson }}</script>{% endif %}
+</body>
+</html>

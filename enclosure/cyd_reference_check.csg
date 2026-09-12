@@ -1,0 +1,42 @@
+group();
+group() {
+	group() {
+		color([0.854902, 0.647059, 0.12549, 1]) {
+			linear_extrude(height = 0.4, center = false, convexity = 1, scale = [1, 1], $fn = 64, $fa = 12, $fs = 2) {
+				group() {
+					difference() {
+						square(size = [86, 50], center = false);
+						group() {
+							multmatrix([[1, 0, 0, 4], [0, 1, 0, 4], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								circle($fn = 64, $fa = 12, $fs = 2, r = 1.6);
+							}
+							multmatrix([[1, 0, 0, 82], [0, 1, 0, 4], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								circle($fn = 64, $fa = 12, $fs = 2, r = 1.6);
+							}
+							multmatrix([[1, 0, 0, 4], [0, 1, 0, 46], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								circle($fn = 64, $fa = 12, $fs = 2, r = 1.6);
+							}
+							multmatrix([[1, 0, 0, 82], [0, 1, 0, 46], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								circle($fn = 64, $fa = 12, $fs = 2, r = 1.6);
+							}
+						}
+					}
+				}
+			}
+		}
+		color([0.27451, 0.509804, 0.705882, 1]) {
+			multmatrix([[1, 0, 0, 96], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+				cube(size = [57.6, 43.2, 0.2], center = false);
+			}
+		}
+		group() {
+			group();
+			group();
+			group();
+			group();
+			group();
+		}
+	}
+}
+group();
+group();

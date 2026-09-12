@@ -1,0 +1,17 @@
+firmware/.pio/
+firmware/.vscode/*
+!firmware/.vscode/extensions.json
+firmware/include/secrets.h
+firmware/include/ota_public_key.h
+homelab/.test-deps/
+homelab/.verify-deps/
+homelab/releases/
+**/__pycache__/
+firmware/keys/
+firmware/releases/
+MiniTV Photos/
+firmware/assets/photo_preview.png
+firmware/include/photo_rgb565.h
+**/*.env
+result.json
+.venv/
