@@ -85,6 +85,7 @@ component-clearance measurements. A separate back cover will have upper/lower
 vents, with a rear cable notch and strain relief for an internal USB-C cable
 running to an external USB power adapter. These features are not in the test gauge.
 
-The archived manufacturer PDF in `reference` illustrates a micro-USB-only board,
-so its 86 x 50 outline, 78 x 42 spacing and 3.2 diameter do not verify this revision.
-Actual user measurements override nominal values; hole diameter remains unverified.
+The manufacturer's [ESP32-2432S028 specification](https://www.guition.com/-download)
+illustrates a micro-USB-only board, so its 86 x 50 outline, 78 x 42 spacing and
+3.2 mm hole diameter do not verify every revision. Physical measurements override
+nominal values; verify the hole diameter and connector layout for your own board.
